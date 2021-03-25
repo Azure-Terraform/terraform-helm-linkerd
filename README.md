@@ -41,4 +41,37 @@ Notes:
 ```
 
 <!--- BEGIN_TF_DOCS --->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 0.13.6 |
+| helm | >= 1.2.4 |
+| kubernetes | ~> 1.13.3 |
+| local | ~> 2.0.0 |
+| null | ~> 3.0.0 |
+| tls | ~> 3.0.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| helm | >= 1.2.4 |
+| tls | ~> 3.0.0 |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| additional\_yaml\_config | used for additional customization of the helm chart values | `string` | `""` | no |
+| ca\_cert\_expiration\_hours | Number of hours added to installation time to calculate trust anchor certification expiration date | `number` | `8760` | no |
+| chart\_repository | Helm chart repository | `string` | `"https://helm.linkerd.io/stable"` | no |
+| chart\_version | Helm chart version | `string` | `"2.10.0"` | no |
+| issuer\_validity\_hours | Number of hours for which the issuer certification is valid (must be shorter than the truste anchor) | `number` | `8760` | no |
+| trust\_anchor\_validity\_hours | Number of hours for which the trust anchor certification is valid | `number` | `17520` | no |
+
+## Outputs
+
+No output.
+
 <!--- END_TF_DOCS --->
