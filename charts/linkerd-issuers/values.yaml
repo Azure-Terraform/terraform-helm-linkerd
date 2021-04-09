@@ -1,0 +1,7 @@
+certificate:
+  controlplane:
+    duration:
+    renewbefore:
+  webhook:
+    duration:
+    renewbefore:

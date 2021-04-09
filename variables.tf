@@ -10,7 +10,7 @@ variable "chart_repository" {
 variable "chart_version" {
   description = "Helm chart version"
   type        = string
-  default     = "2.9.2"
+  default     = "2.10.0"
 }
 
 variable "trust_anchor_validity_hours" {
@@ -19,16 +19,34 @@ variable "trust_anchor_validity_hours" {
   default     = 17520 # 2 years
 }
 
-variable "issuer_validity_hours" {
-  description = "Number of hours for which the issuer certification is valid (must be shorter than the truste anchor)"
-  type        = number
-  default     = 8760 # 1 year
-}
-
 variable "ca_cert_expiration_hours" {
   description = "Number of hours added to installation time to calculate trust anchor certification expiration date"
   type        = number
   default     = 8760 # 1 year
+}
+
+variable "certificate_controlplane_duration" {
+  description = "Number of hours added to installation time to calculate trust anchor certification expiration date"
+  type        = string
+  default     = "48h"
+}
+
+variable "certificate_controlplane_renewbefore" {
+  description = "Number of hours added to installation time to calculate trust anchor certification expiration date"
+  type        = string
+  default     = "25h"
+}
+
+variable "certificate_webhook_duration" {
+  description = "Number of hours added to installation time to calculate trust anchor certification expiration date"
+  type        = string
+  default     = "24h"
+}
+
+variable "certificate_webhook_renewbefore" {
+  description = "Number of hours added to installation time to calculate trust anchor certification expiration date"
+  type        = string
+  default     = "1h"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
