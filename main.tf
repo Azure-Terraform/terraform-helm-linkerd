@@ -13,6 +13,7 @@ resource "tls_private_key" "linkerd" {
   ecdsa_curve = "P256"
 }
 
+## CA cert for Control Plane TLS Credentials
 resource "tls_self_signed_cert" "linkerd_trust_anchor" {
   key_algorithm     = tls_private_key.linkerd["trust_anchor"].algorithm
   private_key_pem   = tls_private_key.linkerd["trust_anchor"].private_key_pem
@@ -26,6 +27,7 @@ resource "tls_self_signed_cert" "linkerd_trust_anchor" {
   }
 }
 
+## CA cert for Webhook TLS Credentials
 resource "tls_self_signed_cert" "webhook_anchor" {
   key_algorithm     = tls_private_key.linkerd["webhook_anchor"].algorithm
   private_key_pem   = tls_private_key.linkerd["webhook_anchor"].private_key_pem
