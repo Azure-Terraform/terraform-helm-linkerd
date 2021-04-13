@@ -43,6 +43,7 @@ spec:
   usages:
     - server auth
 ---
+{{- if (.Values.installLinkerd-viz) -}}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -63,7 +64,11 @@ spec:
     algorithm: ECDSA
   usages:
     - server auth
+{{ end -}}
+
 ---
+
+{{- if (.Values.installLinkerd-viz) -}}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -84,7 +89,11 @@ spec:
     algorithm: ECDSA
   usages:
     - server auth
+{{ end -}}
+
 ---
+
+{{- if (.Values.installLinkerd-viz) -}}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -105,7 +114,10 @@ spec:
     algorithm: ECDSA
   usages:
     - server auth
+{{ end -}}
+
 ---
+{{- if (.Values.installLinkerd-jaeger) -}}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -126,3 +138,4 @@ spec:
     algorithm: ECDSA
   usages:
     - server auth
+{{ end -}}

@@ -5,3 +5,5 @@ certificate:
   webhook:
     duration:
     renewbefore:
+installLinkerd-jaeger:
+installLinkerd-viz:

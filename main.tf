@@ -94,14 +94,16 @@ resource "helm_release" "issuer" {
   chart      = "${path.module}/charts/linkerd-issuers"
   values = [
     yamlencode({
+      installLinkerd-jaeger = contains(var.namespaces, "linkerd-jaeger") ? true : false
+      installLinkerd-viz    = contains(var.namespaces, "linkerd-viz") ? true : false
       certificate = {
         controlplane = {
-          duration    = "${var.certificate_controlplane_duration}"
-          renewbefore = "${var.certificate_controlplane_renewbefore}"
+          duration    = var.certificate_controlplane_duration
+          renewbefore = var.certificate_controlplane_renewbefore
         }
         webhook = {
-          duration    = "${var.certificate_webhook_duration}"
-          renewbefore = "${var.certificate_webhook_renewbefore}"
+          duration    = var.certificate_webhook_duration
+          renewbefore = var.certificate_webhook_renewbefore
         }
       }
     })
