@@ -1,0 +1,9 @@
+certificate:
+  controlplane:
+    duration:
+    renewbefore:
+  webhook:
+    duration:
+    renewbefore:
+installLinkerd-jaeger:
+installLinkerd-viz:
