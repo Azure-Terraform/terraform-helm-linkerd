@@ -16,7 +16,7 @@ spec:
   ca:
     secretName: webhook-issuer-tls
 
-{{ if (.Values.installLinkerd-viz) }}
+{{ if (.Values.installLinkerdViz) }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer
@@ -28,7 +28,7 @@ spec:
     secretName: webhook-issuer-tls
 {{ end }}
 
-{{ if (.Values.installLinkerd-jaeger) }}
+{{ if (.Values.installLinkerdJaeger) }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Issuer

@@ -94,8 +94,8 @@ resource "helm_release" "issuer" {
   chart      = "${path.module}/charts/linkerd-issuers"
   values = [
     yamlencode({
-      installLinkerd-jaeger = contains(var.namespaces, "linkerd-jaeger") ? true : false
-      installLinkerd-viz    = contains(var.namespaces, "linkerd-viz") ? true : false
+      installLinkerdViz    = contains(var.namespaces, "linkerd-viz") ? true : false
+      installLinkerdJaeger = contains(var.namespaces, "linkerd-jaeger") ? true : false
       certificate = {
         controlplane = {
           duration    = var.certificate_controlplane_duration
