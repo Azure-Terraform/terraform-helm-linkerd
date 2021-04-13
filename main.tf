@@ -87,6 +87,27 @@ resource "kubernetes_secret" "linkerd-issuer" {
   }
 }
 
+resource "helm_release" "issuer" {
+  depends_on = [kubernetes_secret.linkerd-trust-anchor]
+  name       = "linkerd-issuer"
+  namespace  = "linkerd"
+  chart      = "${path.module}/charts/linkerd-issuers"
+  values = [
+    yamlencode({
+      certificate = {
+        controlplane = {
+          duration    = "${var.certificate_controlplane_duration}"
+          renewbefore = "${var.certificate_controlplane_renewbefore}"
+        }
+        webhook = {
+          duration    = "${var.certificate_webhook_duration}"
+          renewbefore = "${var.certificate_webhook_renewbefore}"
+        }
+      }
+    })
+  ]
+}
+
 resource "helm_release" "linkerd" {
   depends_on = [kubernetes_namespace.namespace]
 
