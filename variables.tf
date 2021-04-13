@@ -37,9 +37,8 @@ variable "namespaces" {
   default     = ["linkerd", "linkerd-viz"]
 
   validation {
-    condition = alltrue([
-      for n in var.namespaces : contains(["linkerd", "linkerd-viz", "linkerd-jaeger"], n)
-    ])
+    condition = alltrue( [ for n in var.namespaces : contains(["linkerd", "linkerd-viz", "linkerd-jaeger"], n) ])
+#   condition = alltrue( [ contains(["linkerd"], var.namespaces), for n in var.namespaces : contains(["linkerd", "linkerd-viz", "linkerd-jaeger"], n) ])
     error_message = "The namespaces list must contain 'linkerd' and, optionally, any or all of the following: ['linkerd-viz', 'linkerd-jaeger']."
   }
 }

@@ -111,7 +111,7 @@ resource "helm_release" "issuer" {
 }
 
 resource "helm_release" "linkerd" {
-  depends_on = [kubernetes_namespace.namespace]
+  depends_on = [kubernetes_namespace.namespace, helm_release.issuer]
 
   name       = "linkerd"
   chart      = "linkerd2"

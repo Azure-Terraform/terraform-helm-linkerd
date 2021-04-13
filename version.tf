@@ -9,19 +9,19 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~> 2.0.3"
+      version = ">= 1.13.3"
     }
     local = {
       source  = "hashicorp/local"
-      version = "~> 2.1.0"
+      version = ">= 2.0.0"
     }
     null = {
       source  = "hashicorp/null"
-      version = "~> 3.1.0"
+      version = ">= 3.0.0"
     }
     tls = {
       source  = "hashicorp/tls"
-      version = "~> 3.1.0"
+      version = ">= 3.0.0"
     }
   }
 }
