@@ -15,8 +15,9 @@ metadata:
 spec:
   ca:
     secretName: webhook-issuer-tls
+
+{{ if (.Values.installLinkerd-viz) }}
 ---
-{{- if (.Values.installLinkerd-viz) -}}
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
@@ -25,10 +26,10 @@ metadata:
 spec:
   ca:
     secretName: webhook-issuer-tls
-{{ end -}}
+{{ end }}
 
+{{ if (.Values.installLinkerd-jaeger) }}
 ---
-{{- if (.Values.installLinkerd-jaeger) -}}
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
@@ -37,4 +38,4 @@ metadata:
 spec:
   ca:
     secretName: webhook-issuer-tls
-{{ end -}}
+{{ end }}
