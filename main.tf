@@ -49,6 +49,7 @@ resource "kubernetes_namespace" "namespace" {
   for_each = var.namespaces
   metadata {
     name = each.key
+    annotations = (each.key != "linkerd") ? { "linkerd.io/inject" = "enabled" } : {}
   }
 }
 
@@ -92,6 +93,7 @@ resource "helm_release" "issuer" {
   name       = "linkerd-issuer"
   namespace  = "linkerd"
   chart      = "${path.module}/charts/linkerd-issuers"
+
   values = [
     yamlencode({
       installLinkerdViz    = contains(var.namespaces, "linkerd-viz") ? true : false
@@ -146,7 +148,7 @@ resource "helm_release" "linkerd" {
 }
 
 resource "helm_release" "linkerd-viz" {
-  depends_on = [kubernetes_namespace.namespace, helm_release.linkerd]
+  depends_on = [helm_release.linkerd]
 
   count = contains(var.namespaces, "linkerd-viz") ? 1 : 0
 
@@ -175,7 +177,7 @@ resource "helm_release" "linkerd-viz" {
 }
 
 resource "helm_release" "linkerd-jaeger" {
-  depends_on = [kubernetes_namespace.namespace, helm_release.linkerd]
+  depends_on = [helm_release.linkerd-viz]
 
   count = contains(var.namespaces, "linkerd-jaeger") ? 1 : 0
 
