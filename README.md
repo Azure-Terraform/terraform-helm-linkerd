@@ -41,4 +41,45 @@ Notes:
 ```
 
 <!--- BEGIN_TF_DOCS --->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 0.14.0 |
+| helm | >= 2.1.0 |
+| kubernetes | >= 1.13.3 |
+| local | >= 2.0.0 |
+| null | >= 3.0.0 |
+| tls | >= 3.0.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| helm | >= 2.1.0 |
+| kubernetes | >= 1.13.3 |
+| tls | >= 3.0.0 |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| additional\_yaml\_config | used for additional customization of the linkerd helm chart values | `string` | `""` | no |
+| ca\_cert\_expiration\_hours | Number of hours added to installation time to calculate trust anchor certification expiration date | `number` | `8760` | no |
+| certificate\_controlplane\_duration | Number of hours for controlplane certification expiration | `string` | `"1440h"` | no |
+| certificate\_controlplane\_renewbefore | Number of hours before the control plane certification expiration to request for certificate renewal | `string` | `"48h"` | no |
+| certificate\_webhook\_duration | Number of hours for webhook certification expiration | `string` | `"1440h"` | no |
+| certificate\_webhook\_renewbefore | Number of hours before the webhook certification expiration to request for certificate renewal | `string` | `"48h"` | no |
+| chart\_repository | Helm chart repository | `string` | `"https://helm.linkerd.io/stable"` | no |
+| chart\_version | Helm chart version | `string` | `"2.10.1"` | no |
+| issuer\_validity\_hours | Number of hours for which the issuer certification is valid (must be shorter than the trust anchor) | `number` | `8760` | no |
+| jaeger\_additional\_yaml\_config | used for additional customization of the linkerd-jaeger helm chart values | `string` | `""` | no |
+| namespaces | Namespaces for linkerd and optional extensions | `set(string)` | <pre>[<br>  "linkerd",<br>  "linkerd-viz"<br>]</pre> | no |
+| trust\_anchor\_validity\_hours | Number of hours for which the trust anchor certification is valid | `number` | `17520` | no |
+| viz\_additional\_yaml\_config | used for additional customization of the linkerd-viz helm chart values | `string` | `""` | no |
+
+## Outputs
+
+No output.
+
 <!--- END_TF_DOCS --->
