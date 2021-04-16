@@ -10,7 +10,7 @@ variable "chart_repository" {
 variable "chart_version" {
   description = "Helm chart version"
   type        = string
-  default     = "2.10.0"
+  default     = "2.10.1"
 }
 
 variable "trust_anchor_validity_hours" {

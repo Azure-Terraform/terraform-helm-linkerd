@@ -48,8 +48,9 @@ resource "tls_self_signed_cert" "linkerd-issuer" {
 resource "kubernetes_namespace" "namespace" {
   for_each = var.namespaces
   metadata {
-    name = each.key
+    name        = each.key
     annotations = (each.key != "linkerd") ? { "linkerd.io/inject" = "enabled" } : {}
+    labels      = (each.key != "linkerd") ? { "linkerd.io/extension" = trimprefix(each.key, "linkerd-") } : {}
   }
 }
 
