@@ -1,6 +1,6 @@
 # Linkerd Installtion into Kubernetes
 
-This repo contains Terraform code to install the linkerd service mesh into Kubernetes.  It creates the certificates required by linkerd and installs using a helm chart.
+This repo contains Terraform code to install the linkerd service mesh into Kubernetes.  It creates the certificates required by linkerd and installs using helm charts  Cert-Manager in the cluster is required.
 
 ## Example
 ~~~~
@@ -8,7 +8,7 @@ module "service_mesh" {
   source = "https://github.com/Azure-Terraform/terraform-helm-linkerd"
 
   # required values
-  chart_version               = "2.9.2"
+  chart_version               = "2.10.1"
   ca_cert_expiration_hours    = 8760  # 1 year
   trust_anchor_validity_hours = 17520 # 2 years
   issuer_validity_hours       = 8760  # 1 year (must be shorter than the trusted anchor)
