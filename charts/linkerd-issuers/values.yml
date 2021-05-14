@@ -1,0 +1,15 @@
+certificate:
+  controlplane:
+    # duration is the number of hours for controlplane certification expiration
+    duration: 48h
+    # renewbefore is the number of hours before the control plane certification expiration to request for certificate renewal
+    renewbefore: 25h
+  webhook:
+    # duration is the number of hours for webhook expiration
+    duration: 48h
+    # renewbefore is the number of hours before the webhook certification expiration to request for certificate renewal
+    renewbefore: 25h
+# installLinkerdViz is a boolean that indicates if values for the linkerd-viz extension should be installed
+installLinkerdViz: true
+# installLinkerdJaeger is a boolean that indicates if values for the linkerd-jaeger extension should be installed
+installLinkerdJaeger: false

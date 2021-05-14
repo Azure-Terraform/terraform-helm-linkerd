@@ -11,71 +11,193 @@ resource "tls_private_key" "linkerd" {
   ecdsa_curve = "P256"
 }
 
-resource "tls_self_signed_cert" "linkerd-ca" {
+# Control Plane TLS Credentials
+resource "tls_self_signed_cert" "linkerd-trust-anchor" {
   key_algorithm     = tls_private_key.linkerd["trust_anchor"].algorithm
   private_key_pem   = tls_private_key.linkerd["trust_anchor"].private_key_pem
   is_ca_certificate = true
 
   validity_period_hours = var.trust_anchor_validity_hours
-  allowed_uses          = ["cert_signing", "crl_signing"]
+
+  allowed_uses = ["cert_signing", "crl_signing", "server_auth", "client_auth"]
 
   subject {
     common_name = "root.linkerd.cluster.local"
   }
 }
 
-resource "tls_cert_request" "linkerd-cert-request" {
-  key_algorithm   = tls_private_key.linkerd["issuer"].algorithm
-  private_key_pem = tls_private_key.linkerd["issuer"].private_key_pem
+# Webhook TLS Credentials
+resource "tls_self_signed_cert" "linkerd-issuer" {
+  key_algorithm     = tls_private_key.linkerd["issuer"].algorithm
+  private_key_pem   = tls_private_key.linkerd["issuer"].private_key_pem
+  is_ca_certificate = true
+
+  validity_period_hours = var.issuer_validity_hours
+
+  allowed_uses = ["cert_signing", "crl_signing"]
 
   subject {
-    common_name = "identity.linkerd.cluster.local"
+    common_name = "webhook.linkerd.cluster.local"
   }
 }
 
-resource "tls_locally_signed_cert" "linkerd-cert" {
-  is_ca_certificate = true
-
-  cert_request_pem = tls_cert_request.linkerd-cert-request.cert_request_pem
-
-  ca_key_algorithm   = tls_private_key.linkerd["trust_anchor"].algorithm
-  ca_private_key_pem = tls_private_key.linkerd["trust_anchor"].private_key_pem
-  ca_cert_pem        = tls_self_signed_cert.linkerd-ca.cert_pem
-
-  validity_period_hours = var.issuer_validity_hours
-  allowed_uses          = ["cert_signing", "crl_signing"]
-}
 #
 # END
 
-resource "helm_release" "linkerd" {
-  name             = "linkerd"
-  chart            = "${var.chart_repository}/linkerd2-${var.chart_version}.tgz"
-  version          = var.chart_version
-  create_namespace = true
+# create namespaces for linkerd and any extensions (linkerd-viz or linkerd-jaeger)
+resource "kubernetes_namespace" "namespace" {
+  for_each = var.namespaces
+  metadata {
+    name        = each.key
+    annotations = (each.key != "linkerd") ? { "linkerd.io/inject" = "enabled" } : {}
+    labels      = (each.key != "linkerd") ? { "linkerd.io/extension" = trimprefix(each.key, "linkerd-") } : {}
+  }
+}
 
-  set {
-    name  = "global.identityTrustAnchorsPEM"
-    value = tls_self_signed_cert.linkerd-ca.cert_pem
+# create secret used for the control plane credentials
+resource "kubernetes_secret" "linkerd-trust-anchor" {
+  depends_on = [kubernetes_namespace.namespace]
+
+  type = "kubernetes.io/tls"
+
+  metadata {
+    name      = "linkerd-trust-anchor"
+    namespace = "linkerd"
   }
 
-  set {
-    name  = "identity.issuer.tls.keyPEM"
-    value = tls_private_key.linkerd["issuer"].private_key_pem
+  data = {
+    "tls.crt" : tls_self_signed_cert.linkerd-trust-anchor.cert_pem
+    "tls.key" : tls_private_key.linkerd["trust_anchor"].private_key_pem
+  }
+}
+
+# create secrets used for the webhook credentials
+resource "kubernetes_secret" "linkerd-issuer" {
+  depends_on = [kubernetes_namespace.namespace]
+
+  type = "kubernetes.io/tls"
+
+  for_each = var.namespaces
+  metadata {
+    name      = "webhook-issuer-tls"
+    namespace = each.key
   }
 
-  set {
-    name  = "identity.issuer.tls.crtPEM"
-    value = tls_locally_signed_cert.linkerd-cert.cert_pem
+  data = {
+    "tls.crt" : tls_self_signed_cert.linkerd-issuer.cert_pem
+    "tls.key" : tls_private_key.linkerd["issuer"].private_key_pem
   }
+}
 
-  set {
-    name  = "identity.issuer.crtExpiry"
-    value = local.cert_expiration_date
-  }
+resource "helm_release" "issuer" {
+  depends_on = [kubernetes_secret.linkerd-trust-anchor]
+  name       = "linkerd-issuer"
+  namespace  = "linkerd"
+  chart      = "${path.module}/charts/linkerd-issuers"
 
   values = [
+    yamlencode({
+      installLinkerdViz    = contains(var.namespaces, "linkerd-viz") ? true : false
+      installLinkerdJaeger = contains(var.namespaces, "linkerd-jaeger") ? true : false
+      certificate = {
+        controlplane = {
+          duration    = var.certificate_controlplane_duration
+          renewbefore = var.certificate_controlplane_renewbefore
+        }
+        webhook = {
+          duration    = var.certificate_webhook_duration
+          renewbefore = var.certificate_webhook_renewbefore
+        }
+      }
+    })
+  ]
+}
+
+resource "helm_release" "linkerd" {
+  depends_on = [kubernetes_namespace.namespace, helm_release.issuer]
+
+  name       = "linkerd"
+  chart      = "linkerd2"
+  repository = var.chart_repository
+  version    = var.chart_version
+
+  namespace        = "linkerd"
+  create_namespace = false
+
+  values = [
+    yamlencode({
+      installNamespace        = false
+      disableHeartBeat        = true
+      identityTrustAnchorsPEM = tls_self_signed_cert.linkerd-trust-anchor.cert_pem
+      identity = {
+        issuer = {
+          scheme    = "kubernetes.io/tls"
+          crtExpiry = local.cert_expiration_date
+        }
+      }
+      proxyInjector = {
+        caBundle       = tls_self_signed_cert.linkerd-issuer.cert_pem
+        externalSecret = true
+      }
+      profileValidator = {
+        externalSecret = true
+        caBundle       = tls_self_signed_cert.linkerd-issuer.cert_pem
+      }
+    }),
     var.additional_yaml_config
   ]
 }
 
+resource "helm_release" "linkerd-viz" {
+  depends_on = [helm_release.linkerd]
+
+  count = contains(var.namespaces, "linkerd-viz") ? 1 : 0
+
+  name       = "linkerd-viz"
+  chart      = "linkerd-viz"
+  repository = var.chart_repository
+  version    = var.chart_version
+
+  namespace        = "linkerd-viz"
+  create_namespace = false
+
+  values = [
+    yamlencode({
+      installNamespace = false
+      tap = {
+        caBundle       = tls_self_signed_cert.linkerd-issuer.cert_pem
+        externalSecret = true
+      }
+      tapInjector = {
+        externalSecret = true
+        caBundle       = tls_self_signed_cert.linkerd-issuer.cert_pem
+      }
+    }),
+    var.additional_yaml_config
+  ]
+}
+
+resource "helm_release" "linkerd-jaeger" {
+  depends_on = [helm_release.linkerd-viz]
+
+  count = contains(var.namespaces, "linkerd-jaeger") ? 1 : 0
+
+  name       = "linkerd-jaeger"
+  chart      = "linkerd-jaeger"
+  repository = var.chart_repository
+  version    = var.chart_version
+
+  namespace        = "linkerd-jaeger"
+  create_namespace = false
+
+  values = [
+    yamlencode({
+      installNamespace = false
+      webhook = {
+        externalSecret = true
+        caBundle       = tls_self_signed_cert.linkerd-issuer.cert_pem
+      }
+    }),
+    var.jaeger_additional_yaml_config
+  ]
+}

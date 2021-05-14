@@ -1,23 +1,23 @@
 terraform {
+  required_version = ">= 0.14.8"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "=2.32.0"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "=2.3.0"
-    }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = ">=1.13.0"
+      version = ">=2.51.0"
     }
     helm = {
       source  = "hashicorp/helm"
       version = ">=2.0.0"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">=1.13.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0.0"
+    }
   }
-  required_version = ">=0.13.6"
 }
 
 provider "azurerm" {
@@ -51,16 +51,16 @@ resource "random_string" "product" {
 }
 
 module "subscription" {
-  source          = "github.com/Azure-Terraform/terraform-azurerm-subscription-data.git?ref=v1.0.0"
+  source = "git::git@github.com:Azure-Terraform/terraform-azurerm-subscription-data.git?ref=v1.0.0"
   subscription_id = data.azurerm_subscription.current.subscription_id
 }
 
 module "naming" {
-  source = "github.com/Azure-Terraform/example-naming-template.git?ref=v1.0.0"
+  source = "git::git@github.com:LexisNexis-RBA/terraform-azurerm-naming.git?ref=v1.0.18"
 }
 
 module "metadata" {
-  source = "github.com/Azure-Terraform/terraform-azurerm-metadata.git?ref=v1.1.0"
+  source = "git::git@github.com:Azure-Terraform/terraform-azurerm-metadata.git?ref=v1.1.0"
 
   naming_rules = module.naming.yaml
 
@@ -77,7 +77,7 @@ module "metadata" {
 }
 
 module "resource_group" {
-  source = "github.com/Azure-Terraform/terraform-azurerm-resource-group.git?ref=v1.0.0"
+  source = "git::git@github.com:Azure-Terraform/terraform-azurerm-resource-group.git?ref=v1.0.0"
 
   location = module.metadata.location
   names    = module.metadata.names
@@ -87,7 +87,7 @@ module "resource_group" {
 module "kubernetes" {
   source = "git::git@github.com:Azure-Terraform/terraform-azurerm-kubernetes.git?ref=v1.6.0"
 
-  kubernetes_version = "1.18.10"
+  kubernetes_version = "1.19.7"
 
   location            = module.metadata.location
   names               = module.metadata.names
@@ -95,10 +95,10 @@ module "kubernetes" {
   resource_group_name = module.resource_group.name
 
   default_node_pool_name                = "default"
-  default_node_pool_vm_size             = "Standard_D2as_v4"
+  default_node_pool_vm_size             = "Standard_B2s"
   default_node_pool_enable_auto_scaling = true
   default_node_pool_node_min_count      = 1
-  default_node_pool_node_max_count      = 5
+  default_node_pool_node_max_count      = 3
   default_node_pool_availability_zones  = [1, 2, 3]
 }
 
@@ -110,7 +110,7 @@ module "service_mesh" {
   source = "../"
 
   # required values
-  chart_version               = "2.9.2"
+  chart_version               = "2.10.1"
   ca_cert_expiration_hours    = 8760  # 1 year
   trust_anchor_validity_hours = 17520 # 2 years
   issuer_validity_hours       = 8760  # 1 year (must be shorter than the trusted anchor)

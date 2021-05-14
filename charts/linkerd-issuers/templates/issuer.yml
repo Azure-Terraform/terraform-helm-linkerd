@@ -1,0 +1,41 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: linkerd-trust-anchor
+  namespace: linkerd
+spec:
+  ca:
+    secretName: linkerd-trust-anchor
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: webhook-issuer
+  namespace: linkerd
+spec:
+  ca:
+    secretName: webhook-issuer-tls
+
+{{ if (.Values.installLinkerdViz) }}
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: webhook-issuer
+  namespace: linkerd-viz
+spec:
+  ca:
+    secretName: webhook-issuer-tls
+{{ end }}
+
+{{ if (.Values.installLinkerdJaeger) }}
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: webhook-issuer
+  namespace: linkerd-jaeger
+spec:
+  ca:
+    secretName: webhook-issuer-tls
+{{ end }}
