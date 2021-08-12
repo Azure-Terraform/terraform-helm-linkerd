@@ -173,7 +173,7 @@ resource "helm_release" "linkerd-viz" {
         caBundle       = tls_self_signed_cert.linkerd-issuer.cert_pem
       }
     }),
-    var.additional_yaml_config
+    var.viz_additional_yaml_config
   ]
 }
 
