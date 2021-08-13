@@ -120,9 +120,9 @@ resource "helm_release" "linkerd" {
   chart      = "linkerd2"
   repository = var.chart_repository
   version    = var.chart_version
-
   namespace        = "linkerd"
   create_namespace = false
+  timeout    = var.linkerd_helm_install_timeout_secs
 
   values = [
     yamlencode({
@@ -157,9 +157,9 @@ resource "helm_release" "linkerd-viz" {
   chart      = "linkerd-viz"
   repository = var.chart_repository
   version    = var.chart_version
-
   namespace        = "linkerd-viz"
   create_namespace = false
+  timeout    = var.linkerd_helm_install_timeout_secs
 
   values = [
     yamlencode({
@@ -186,9 +186,9 @@ resource "helm_release" "linkerd-jaeger" {
   chart      = "linkerd-jaeger"
   repository = var.chart_repository
   version    = var.chart_version
-
   namespace        = "linkerd-jaeger"
   create_namespace = false
+  timeout    = var.linkerd_helm_install_timeout_secs
 
   values = [
     yamlencode({
