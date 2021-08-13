@@ -94,7 +94,7 @@ resource "helm_release" "issuer" {
   name       = "linkerd-issuer"
   namespace  = "linkerd"
   chart      = "${path.module}/charts/linkerd-issuers"
-
+  timeout    = var.linkerd_helm_install_timeout_secs
   values = [
     yamlencode({
       installLinkerdViz    = contains(var.namespaces, "linkerd-viz") ? true : false
