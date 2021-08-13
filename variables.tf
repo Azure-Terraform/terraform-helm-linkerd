@@ -91,3 +91,10 @@ variable "certificate_webhook_renewbefore" {
   type        = string
   default     = "48h"
 }
+
+
+variable "linkerd_helm_install_timeout_secs" {
+  description = "The number of seconds to wait for the linkerd chart to be deployed. the default is 900 (15 minutes)"
+  type = string
+  default = "900"
+}
