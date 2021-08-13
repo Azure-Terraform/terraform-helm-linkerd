@@ -43,7 +43,6 @@ spec:
   usages:
     - server auth
 
-{{ if (.Values.installLinkerdViz) }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -65,7 +64,6 @@ spec:
     algorithm: ECDSA
   usages:
     - server auth
-{{ end }}
 
 {{ if (.Values.installLinkerdViz) }}
 ---
