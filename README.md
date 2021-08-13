@@ -74,6 +74,7 @@ Notes:
 | chart\_version | Helm chart version | `string` | `"2.10.1"` | no |
 | issuer\_validity\_hours | Number of hours for which the issuer certification is valid (must be shorter than the trust anchor) | `number` | `8760` | no |
 | jaeger\_additional\_yaml\_config | used for additional customization of the linkerd-jaeger helm chart values | `string` | `""` | no |
+| linkerd\_helm\_install\_timeout\_secs | The number of seconds to wait for the linkerd chart to be deployed. the default is 900 (15 minutes) | `string` | `"900"` | no |
 | namespaces | Namespaces for linkerd and optional extensions | `set(string)` | <pre>[<br>  "linkerd",<br>  "linkerd-viz"<br>]</pre> | no |
 | trust\_anchor\_validity\_hours | Number of hours for which the trust anchor certification is valid | `number` | `17520` | no |
 | viz\_additional\_yaml\_config | used for additional customization of the linkerd-viz helm chart values | `string` | `""` | no |
