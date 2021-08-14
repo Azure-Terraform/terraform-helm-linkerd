@@ -3,7 +3,7 @@ resource "time_static" "cert_create_time" {
 
 locals {
   # set certification expiration date for the number of hours specified
-  cert_expiration_date = timeadd(time_static.cert_create_time, "${var.ca_cert_expiration_hours}h")
+  cert_expiration_date = timeadd(time_static.cert_create_time.rfc3339, "${var.ca_cert_expiration_hours}h")
 }
 
 # create certificates for the trust anchor and issuer
