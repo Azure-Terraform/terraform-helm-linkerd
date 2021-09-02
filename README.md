@@ -58,6 +58,7 @@ Notes:
 |------|---------|
 | helm | >= 2.1.0 |
 | kubernetes | >= 1.13.3 |
+| time | n/a |
 | tls | >= 3.0.0 |
 
 ## Inputs
