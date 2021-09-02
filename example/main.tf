@@ -117,4 +117,5 @@ module "service_mesh" {
 
   # optional value for linkerd config (in this case, override the default 'clockSkewAllowance' of 20s (for example purposes))
   additional_yaml_config = yamlencode({ "identity" : { "issuer" : { "clockSkewAllowance" : "30s" } } })
+  linkerd_helm_install_timeout_secs = "2000"
 }
