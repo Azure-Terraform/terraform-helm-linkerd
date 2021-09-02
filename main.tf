@@ -1,6 +1,9 @@
+resource "time_static" "cert_create_time" {
+}
+
 locals {
   # set certification expiration date for the number of hours specified
-  cert_expiration_date = timeadd(timestamp(), "${var.ca_cert_expiration_hours}h")
+  cert_expiration_date = timeadd(time_static.cert_create_time.rfc3339, "${var.ca_cert_expiration_hours}h")
 }
 
 # create certificates for the trust anchor and issuer
@@ -120,9 +123,9 @@ resource "helm_release" "linkerd" {
   chart      = "linkerd2"
   repository = var.chart_repository
   version    = var.chart_version
-
   namespace        = "linkerd"
   create_namespace = false
+  timeout    = var.linkerd_helm_install_timeout_secs
 
   values = [
     yamlencode({
@@ -157,9 +160,9 @@ resource "helm_release" "linkerd-viz" {
   chart      = "linkerd-viz"
   repository = var.chart_repository
   version    = var.chart_version
-
   namespace        = "linkerd-viz"
   create_namespace = false
+  timeout    = var.linkerd_helm_install_timeout_secs
 
   values = [
     yamlencode({
@@ -186,9 +189,9 @@ resource "helm_release" "linkerd-jaeger" {
   chart      = "linkerd-jaeger"
   repository = var.chart_repository
   version    = var.chart_version
-
   namespace        = "linkerd-jaeger"
   create_namespace = false
+  timeout    = var.linkerd_helm_install_timeout_secs
 
   values = [
     yamlencode({
