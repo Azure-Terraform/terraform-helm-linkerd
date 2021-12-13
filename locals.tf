@@ -1,23 +1,15 @@
 locals {
-  issuer = {
-    installLinkerdViz    = contains(var.namespaces, "linkerd-viz") ? true : false
-    installLinkerdJaeger = contains(var.namespaces, "linkerd-jaeger") ? true : false
-    certificate = {
-      controlplane = {
-        duration    = var.certificate_controlplane_duration
-        renewbefore = var.certificate_controlplane_renewbefore
-      }
-      webhook = {
-        duration    = var.certificate_webhook_duration
-        renewbefore = var.certificate_webhook_renewbefore
-      }
-    }
-  }
+  # set certification expiration date for the number of hours specified
+  cert_expiration_date = timeadd(time_static.cert_create_time.rfc3339, "${var.ca_cert_expiration_hours}h")
+
+  namespaces = concat(
+    [var.chart_namespace],
+    [for e in var.extensions : format("linkerd-%s", e)]
+  )
 
   linkerd = {
-    installNamespace        = false
-    disableHeartBeat        = true
-    identityTrustAnchorsPEM = tls_self_signed_cert.linkerd-trust-anchor.cert_pem
+    installNamespace = false
+    disableHeartBeat = true
     identity = {
       issuer = {
         scheme    = "kubernetes.io/tls"
@@ -25,12 +17,34 @@ locals {
       }
     }
     proxyInjector = {
-      caBundle       = tls_self_signed_cert.linkerd-issuer.cert_pem
+      caBundle       = module.issuer.cert_pem.webhook
       externalSecret = true
     }
     profileValidator = {
       externalSecret = true
-      caBundle       = tls_self_signed_cert.linkerd-issuer.cert_pem
+      caBundle       = module.issuer.cert_pem.webhook
+    }
+  }
+
+  extensions = {
+    viz = {
+      installNamespace = false
+      tap = {
+        caBundle       = module.issuer.cert_pem.webhook
+        externalSecret = true
+      }
+      tapInjector = {
+        caBundle       = module.issuer.cert_pem.webhook
+        externalSecret = true
+      }
+    }
+
+    jaeger = {
+      installNamespace = false
+      webhook = {
+        caBundle       = module.issuer.cert_pem.webhook
+        externalSecret = true
+      }
     }
   }
 }

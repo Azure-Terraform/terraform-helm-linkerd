@@ -2,7 +2,6 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: linkerd-identity-issuer
-  namespace: linkerd
 spec:
   secretName: linkerd-identity-issuer
   duration: {{ .Values.certificate.controlPlane.duration }}
@@ -26,7 +25,6 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: linkerd-proxy-injector
-  namespace: linkerd
 spec:
   secretName: linkerd-proxy-injector-k8s-tls
   duration: {{ .Values.certificate.webhook.duration }}
@@ -48,7 +46,6 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: linkerd-sp-validator
-  namespace: linkerd
 spec:
   secretName: linkerd-sp-validator-k8s-tls
   duration: {{ .Values.certificate.webhook.duration }}
@@ -87,9 +84,6 @@ spec:
     algorithm: ECDSA
   usages:
     - server auth
-{{ end }}
-
-{{ if (.Values.installLinkerdViz) }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
