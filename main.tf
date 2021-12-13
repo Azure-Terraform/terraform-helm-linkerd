@@ -99,20 +99,7 @@ resource "helm_release" "issuer" {
   chart      = "${path.module}/charts/linkerd-issuers"
   timeout    = var.linkerd_helm_install_timeout_secs
   values = [
-    yamlencode({
-      installLinkerdViz    = contains(var.namespaces, "linkerd-viz") ? true : false
-      installLinkerdJaeger = contains(var.namespaces, "linkerd-jaeger") ? true : false
-      certificate = {
-        controlplane = {
-          duration    = var.certificate_controlplane_duration
-          renewbefore = var.certificate_controlplane_renewbefore
-        }
-        webhook = {
-          duration    = var.certificate_webhook_duration
-          renewbefore = var.certificate_webhook_renewbefore
-        }
-      }
-    })
+    yamlencode(local.issuer)
   ]
 }
 
@@ -121,32 +108,13 @@ resource "helm_release" "linkerd" {
 
   name       = "linkerd"
   chart      = "linkerd2"
+  namespace  = var.chart_namespace
   repository = var.chart_repository
   version    = var.chart_version
-  namespace        = "linkerd"
-  create_namespace = false
   timeout    = var.linkerd_helm_install_timeout_secs
 
   values = [
-    yamlencode({
-      installNamespace        = false
-      disableHeartBeat        = true
-      identityTrustAnchorsPEM = tls_self_signed_cert.linkerd-trust-anchor.cert_pem
-      identity = {
-        issuer = {
-          scheme    = "kubernetes.io/tls"
-          crtExpiry = local.cert_expiration_date
-        }
-      }
-      proxyInjector = {
-        caBundle       = tls_self_signed_cert.linkerd-issuer.cert_pem
-        externalSecret = true
-      }
-      profileValidator = {
-        externalSecret = true
-        caBundle       = tls_self_signed_cert.linkerd-issuer.cert_pem
-      }
-    }),
+    yamlencode(local.linkerd),
     var.additional_yaml_config
   ]
 }

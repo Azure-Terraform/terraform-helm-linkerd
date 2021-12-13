@@ -5,8 +5,8 @@ metadata:
   namespace: linkerd
 spec:
   secretName: linkerd-identity-issuer
-  duration: {{ .Values.certificate.controlplane.duration }}
-  renewBefore: {{ .Values.certificate.controlplane.renewbefore }}
+  duration: {{ .Values.certificate.controlPlane.duration }}
+  renewBefore: {{ .Values.certificate.controlPlane.renewBefore }}
   issuerRef:
     name: linkerd-trust-anchor
     kind: Issuer
@@ -30,7 +30,7 @@ metadata:
 spec:
   secretName: linkerd-proxy-injector-k8s-tls
   duration: {{ .Values.certificate.webhook.duration }}
-  renewBefore: {{ .Values.certificate.webhook.renewbefore }}
+  renewBefore: {{ .Values.certificate.webhook.renewBefore }}
   issuerRef:
     name: webhook-issuer
     kind: Issuer
@@ -52,7 +52,7 @@ metadata:
 spec:
   secretName: linkerd-sp-validator-k8s-tls
   duration: {{ .Values.certificate.webhook.duration }}
-  renewBefore: {{ .Values.certificate.webhook.renewbefore }}
+  renewBefore: {{ .Values.certificate.webhook.renewBefore }}
   issuerRef:
     name: webhook-issuer
     kind: Issuer
@@ -75,7 +75,7 @@ metadata:
 spec:
   secretName: tap-k8s-tls
   duration: {{ .Values.certificate.webhook.duration }}
-  renewBefore: {{ .Values.certificate.webhook.renewbefore }}
+  renewBefore: {{ .Values.certificate.webhook.renewBefore }}
   issuerRef:
     name: webhook-issuer
     kind: Issuer
@@ -99,7 +99,7 @@ metadata:
 spec:
   secretName: tap-injector-k8s-tls
   duration: {{ .Values.certificate.webhook.duration }}
-  renewBefore: {{ .Values.certificate.webhook.renewbefore }}
+  renewBefore: {{ .Values.certificate.webhook.renewBefore }}
   issuerRef:
     name: webhook-issuer
     kind: Issuer
@@ -123,7 +123,7 @@ metadata:
 spec:
   secretName: jaeger-injector-k8s-tls
   duration: {{ .Values.certificate.webhook.duration }}
-  renewBefore: {{ .Values.certificate.webhook.renewbefore }}
+  renewBefore: {{ .Values.certificate.webhook.renewBefore }}
   issuerRef:
     name: webhook-issuer
     kind: Issuer

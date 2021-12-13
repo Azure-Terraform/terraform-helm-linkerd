@@ -13,6 +13,12 @@ variable "chart_version" {
   default     = "2.10.1"
 }
 
+variable "chart_namespace" {
+  type        = string
+  description = "Namespace to install linkerd."
+  default     = "linkerd"
+}
+
 variable "trust_anchor_validity_hours" {
   description = "Number of hours for which the trust anchor certification is valid"
   type        = number
