@@ -8,6 +8,7 @@ locals {
   )
 
   linkerd = {
+    cniEnabled       = var.cni_enabled
     installNamespace = false
     disableHeartBeat = true
     identity = {

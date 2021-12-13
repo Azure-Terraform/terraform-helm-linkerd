@@ -112,10 +112,10 @@ resource "kubernetes_manifest" "webhook" {
       dnsNames    = ["${each.value.name}.linkerd.cluster.local"]
       duration    = var.certificate_webhook_duration
       renewBefore = var.certificate_webhook_renewbefore
-      isCA        = false
-      privateKey  = { algorithm = "ECDSA" }
-      secretName  = "${each.value.name}-k8s-tls" # checkov:skip=CKV_SECRET_6: Irrelevent
-      usages      = ["server auth"]
+      #isCA        = false
+      privateKey = { algorithm = "ECDSA" }
+      secretName = "${each.value.name}-k8s-tls" # checkov:skip=CKV_SECRET_6: Irrelevent
+      usages     = ["server auth"]
       issuerRef = {
         kind = "Issuer"
         name = "webhook-issuer"

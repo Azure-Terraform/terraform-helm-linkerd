@@ -11,6 +11,17 @@ module "issuer" {
   ca_cert_expiration_hours    = var.ca_cert_expiration_hours
 }
 
+resource "helm_release" "cni" {
+  count = var.cni_enabled ? 1 : 0
+
+  name             = "linkerd-cni"
+  namespace        = "linkerd-cni"
+  chart            = "linkerd2-cni"
+  create_namespace = true
+  repository       = var.chart_repository
+  atomic           = var.atomic
+}
+
 resource "helm_release" "linkerd" {
   name       = "linkerd"
   chart      = "linkerd2"
@@ -25,12 +36,12 @@ resource "helm_release" "linkerd" {
     value = module.issuer.cert_pem.root
   }
 
-  values = [
-    yamlencode(local.linkerd),
-    var.additional_yaml_config
-  ]
+  values = concat(
+    var.ha_enabled ? [data.http.ha_values.body] : [],
+    [yamlencode(local.linkerd), var.additional_yaml_config]
+  )
 
-  depends_on = [module.issuer]
+  depends_on = [helm_release.cni, module.issuer]
 }
 
 resource "helm_release" "extension" {

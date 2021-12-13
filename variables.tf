@@ -31,6 +31,18 @@ variable "atomic" {
   default     = true
 }
 
+variable "cni_enabled" {
+  type        = bool
+  description = "Whether to enable the cni plugin."
+  default     = true
+}
+
+variable "ha_enabled" {
+  type        = bool
+  description = "Whether to enable high availability settings."
+  default     = true
+}
+
 variable "trust_anchor_validity_hours" {
   description = "Number of hours for which the trust anchor certification is valid"
   type        = number
@@ -74,23 +86,23 @@ variable "additional_yaml_config" {
 variable "certificate_controlplane_duration" {
   description = "Number of hours for controlplane certification expiration"
   type        = string
-  default     = "1440h"
+  default     = "1440h0m0s"
 }
 
 variable "certificate_controlplane_renewbefore" {
   description = "Number of hours before the control plane certification expiration to request for certificate renewal"
   type        = string
-  default     = "48h"
+  default     = "48h0m0s"
 }
 
 variable "certificate_webhook_duration" {
   description = "Number of hours for webhook certification expiration"
   type        = string
-  default     = "1440h"
+  default     = "1440h0m0s"
 }
 
 variable "certificate_webhook_renewbefore" {
   description = "Number of hours before the webhook certification expiration to request for certificate renewal"
   type        = string
-  default     = "48h"
+  default     = "48h0m0s"
 }
