@@ -5,6 +5,10 @@ module "issuer" {
 
   namespace  = var.chart_namespace
   extensions = var.extensions
+
+  trust_anchor_validity_hours = var.trust_anchor_validity_hours
+  issuer_validity_hours       = var.issuer_validity_hours
+  ca_cert_expiration_hours    = var.ca_cert_expiration_hours
 }
 
 resource "helm_release" "linkerd" {
@@ -14,7 +18,7 @@ resource "helm_release" "linkerd" {
   repository = var.chart_repository
   version    = var.chart_version
   timeout    = var.chart_timeout
-  atomic     = true
+  atomic     = var.atomic
 
   set_sensitive {
     name  = "identityTrustAnchorsPEM"
@@ -35,7 +39,7 @@ resource "helm_release" "extension" {
   repository = var.chart_repository
   version    = var.chart_version
   timeout    = var.chart_timeout
-  atomic     = true
+  atomic     = var.atomic
 
   name      = format("linkerd-%s", each.key)
   chart     = format("linkerd-%s", each.key)

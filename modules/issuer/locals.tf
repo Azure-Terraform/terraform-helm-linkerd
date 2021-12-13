@@ -34,16 +34,16 @@ locals {
   )
 
   certificate_map = {
-    linkerd = ["linkerd-proxy-injector", "linkerd-sp-validator"]
-    linkerd-viz = ["tap", "tap-injector"]
+    linkerd        = ["linkerd-proxy-injector", "linkerd-sp-validator"]
+    linkerd-viz    = ["tap", "tap-injector"]
     linkerd-jaeger = ["jaeger-injector"]
   }
 
   certificates = {
     for crt in flatten([
-    for n in local.namespaces: [
-      for c in local.certificate_map[n]: {
-      namespace = n
-      name = c
-    }]]): "${crt.namespace}:${crt.name}" => crt }
+      for n in local.namespaces : [
+        for c in local.certificate_map[n] : {
+          namespace = n
+          name      = c
+  }]]) : "${crt.namespace}:${crt.name}" => crt }
 }

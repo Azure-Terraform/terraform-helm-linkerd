@@ -10,7 +10,7 @@ variable "chart_repository" {
 variable "chart_version" {
   description = "Helm chart version"
   type        = string
-  default     = "2.10.1"
+  default     = "2.11.1"
 }
 
 variable "chart_namespace" {
@@ -23,6 +23,12 @@ variable "chart_timeout" {
   description = "The number of seconds to wait for the linkerd chart to be deployed. the default is 900 (15 minutes)"
   type        = string
   default     = "900"
+}
+
+variable "atomic" {
+  type        = bool
+  description = "Whether the chart should be installed with the atomic flag"
+  default     = true
 }
 
 variable "trust_anchor_validity_hours" {

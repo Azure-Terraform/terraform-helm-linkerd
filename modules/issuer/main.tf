@@ -25,7 +25,7 @@ resource "tls_self_signed_cert" "this" {
 
 # create namespaces for linkerd and any extensions (linkerd-viz or linkerd-jaeger)
 resource "kubernetes_namespace" "namespace" {
-  for_each = local.namespaces
+  for_each = toset(local.namespaces)
   metadata {
     name        = each.key
     annotations = (each.key != var.namespace) ? { "linkerd.io/inject" = "enabled" } : {}
