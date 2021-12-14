@@ -1,17 +1,3 @@
-terraform {
-  required_version = ">= 0.15.0"
-  required_providers {
-    helm = {
-      source  = "hashicorp/helm"
-      version = ">= 2.1.1"
-    }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = ">= 2.5.0"
-    }
-  }
-}
-
 provider "kubernetes" {
   config_path = "~/.kube/config"
 }
@@ -25,6 +11,9 @@ provider "helm" {
 module "service_mesh" {
   source = "../"
 
+  ha_enabled  = true
+  cni_enabled = true
+
   chart_timeout               = 2000
   ca_cert_expiration_hours    = 8760  # 1 year
   trust_anchor_validity_hours = 17520 # 2 years
@@ -33,5 +22,5 @@ module "service_mesh" {
   # optional value for linkerd config (in this case, override the default 'clockSkewAllowance' of 20s (for example purposes))
   additional_yaml_config = yamlencode({ "identity" : { "issuer" : { "clockSkewAllowance" : "30s" } } })
 
-  extensions = ["viz", "jaeger"]
+  extensions = ["viz"]
 }

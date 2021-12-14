@@ -46,7 +46,7 @@ content: |-
   ## Example
 
   ```hcl
-  {{ include "examples/shared/main.tf" }}
+  {{ include "example/main.tf" }}
   ```
 
   {{ .Inputs }}

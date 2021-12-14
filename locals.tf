@@ -18,7 +18,7 @@ locals {
       }
     }
     # Must ignore outbound 443 for vault injector to work
-    proxyInit = { ignoreOutboundPorts = "4567,4568,443" }
+    # proxyInit = { ignoreOutboundPorts = "4567,4568,443" }
   }
 
   components = {
