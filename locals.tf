@@ -17,31 +17,13 @@ locals {
         crtExpiry = local.cert_expiration_date
       }
     }
-    proxyInjector = { externalSecret = true }
-    profileValidator = { externalSecret = true }
     # Must ignore outbound 443 for vault injector to work
     proxyInit = { ignoreOutboundPorts = "4567,4568,443" }
   }
 
-  extensions = {
-    viz = {
-      installNamespace = false
-      tap = {
-        caBundle       = module.issuer.cert_pem.webhook
-        externalSecret = true
-      }
-      tapInjector = {
-        caBundle       = module.issuer.cert_pem.webhook
-        externalSecret = true
-      }
-    }
-
-    jaeger = {
-      installNamespace = false
-      webhook = {
-        caBundle       = module.issuer.cert_pem.webhook
-        externalSecret = true
-      }
-    }
+  components = {
+    linkerd = ["proxyInjector", "profileValidator"]
+    viz    = ["tap", "tapInjector"]
+    jaeger = ["webhook"]
   }
 }

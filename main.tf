@@ -14,21 +14,21 @@ module "issuer" {
 resource "kubernetes_namespace" "cni" {
   count = var.cni_enabled ? 1 : 0
   metadata {
-    name        = "linkerd-cni"
+    name = "linkerd-cni"
   }
 }
 
 resource "helm_release" "cni" {
   count = var.cni_enabled ? 1 : 0
 
-  name             = "linkerd-cni"
-  namespace        = "linkerd-cni"
-  chart            = "linkerd2-cni"
-  repository       = var.chart_repository
-  atomic           = var.atomic
+  name       = "linkerd-cni"
+  namespace  = "linkerd-cni"
+  chart      = "linkerd2-cni"
+  repository = var.chart_repository
+  atomic     = var.atomic
 
   set {
-    name = "installNamespace"
+    name  = "installNamespace"
     value = "false"
   }
 
@@ -49,18 +49,24 @@ resource "helm_release" "linkerd" {
     value = module.issuer.cert_pem.root
   }
 
-  set_sensitive {
-    name  = "proxyInjector.caBundle"
-    value = module.issuer.cert_pem.webhook
+  dynamic "set_sensitive" {
+    for_each = toset(local.components.linkerd)
+    content {
+      name  = "${set_sensitive.key}.caBundle"
+      value = module.issuer.cert_pem.webhook
+    }
   }
 
-  set_sensitive {
-    name  = "profileValidator.caBundle"
-    value = module.issuer.cert_pem.webhook
+  dynamic "set" {
+    for_each = toset(local.components.linkerd)
+    content {
+      name  = "${set.key}.externalSecret"
+      value = true
+    }
   }
 
   values = concat(
-    var.ha_enabled ? [data.http.ha_values.body] : [],
+    var.ha_enabled ? [data.http.ha_values[0].body] : [],
     [yamlencode(local.linkerd), var.additional_yaml_config]
   )
 
@@ -79,9 +85,28 @@ resource "helm_release" "extension" {
   chart     = format("linkerd-%s", each.key)
   namespace = format("linkerd-%s", each.key)
 
-  values = [
-    yamlencode(local.extensions[each.key])
-  ]
+  set {
+    name  = "installNamespace"
+    value = false
+  }
+
+  dynamic "set_sensitive" {
+    for_each = toset(local.components[each.key])
+    content {
+      name  = "${set_sensitive.key}.caBundle"
+      value = module.issuer.cert_pem.webhook
+    }
+  }
+
+  dynamic "set" {
+    for_each = toset(local.components[each.key])
+    content {
+      name  = "${set.key}.externalSecret"
+      value = true
+    }
+  }
+
+  values = var.ha_enabled && each.key == "viz" ? [data.http.viz_ha_values[0].body] : []
 
   depends_on = [helm_release.linkerd]
 }
