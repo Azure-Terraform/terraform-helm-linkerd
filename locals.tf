@@ -17,14 +17,10 @@ locals {
         crtExpiry = local.cert_expiration_date
       }
     }
-    proxyInjector = {
-      caBundle       = module.issuer.cert_pem.webhook
-      externalSecret = true
-    }
-    profileValidator = {
-      externalSecret = true
-      caBundle       = module.issuer.cert_pem.webhook
-    }
+    proxyInjector = { externalSecret = true }
+    profileValidator = { externalSecret = true }
+    # Must ignore outbound 443 for vault injector to work
+    proxyInit = { ignoreOutboundPorts = "4567,4568,443" }
   }
 
   extensions = {

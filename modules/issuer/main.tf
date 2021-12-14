@@ -81,7 +81,7 @@ resource "kubernetes_manifest" "certificate" {
     spec = {
       commonName = "identity.linkerd.cluster.local"
       dnsNames   = ["identity.linkerd.cluster.local"]
-      duration   = "48h0m0s"
+      duration   = var.certificate_controlplane_duration
       isCA       = true
       issuerRef = {
         kind = "Issuer"
@@ -90,7 +90,7 @@ resource "kubernetes_manifest" "certificate" {
       privateKey = {
         algorithm = "ECDSA"
       }
-      renewBefore = "25h0m0s"
+      renewBefore = var.certificate_controlplane_renewbefore
       secretName  = "linkerd-identity-issuer" # checkov:skip=CKV_SECRET_6: Irrelevent
       usages      = ["cert sign", "crl sign", "server auth", "client auth"]
     }
@@ -108,8 +108,8 @@ resource "kubernetes_manifest" "webhook" {
       namespace = each.value.namespace
     }
     spec = {
-      commonName  = "${each.value.name}.linkerd.cluster.local"
-      dnsNames    = ["${each.value.name}.linkerd.cluster.local"]
+      commonName  = "${each.value.name}.linkerd.svc"
+      dnsNames    = ["${each.value.name}.linkerd.svc"]
       duration    = var.certificate_webhook_duration
       renewBefore = var.certificate_webhook_renewbefore
       #isCA        = false

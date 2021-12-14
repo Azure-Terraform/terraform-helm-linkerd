@@ -11,15 +11,28 @@ module "issuer" {
   ca_cert_expiration_hours    = var.ca_cert_expiration_hours
 }
 
+resource "kubernetes_namespace" "cni" {
+  count = var.cni_enabled ? 1 : 0
+  metadata {
+    name        = "linkerd-cni"
+  }
+}
+
 resource "helm_release" "cni" {
   count = var.cni_enabled ? 1 : 0
 
   name             = "linkerd-cni"
   namespace        = "linkerd-cni"
   chart            = "linkerd2-cni"
-  create_namespace = true
   repository       = var.chart_repository
   atomic           = var.atomic
+
+  set {
+    name = "installNamespace"
+    value = "false"
+  }
+
+  depends_on = [kubernetes_namespace.cni]
 }
 
 resource "helm_release" "linkerd" {
@@ -34,6 +47,16 @@ resource "helm_release" "linkerd" {
   set_sensitive {
     name  = "identityTrustAnchorsPEM"
     value = module.issuer.cert_pem.root
+  }
+
+  set_sensitive {
+    name  = "proxyInjector.caBundle"
+    value = module.issuer.cert_pem.webhook
+  }
+
+  set_sensitive {
+    name  = "profileValidator.caBundle"
+    value = module.issuer.cert_pem.webhook
   }
 
   values = concat(
