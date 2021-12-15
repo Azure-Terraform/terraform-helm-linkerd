@@ -52,74 +52,13 @@ resource "kubernetes_secret" "this" {
   depends_on = [kubernetes_namespace.namespace]
 }
 
-resource "kubernetes_manifest" "issuer" {
-  for_each = local.issuers
+resource "helm_release" "issuer" {
+  name      = "linkerd-issuer"
+  namespace = "linkerd"
+  chart     = "${path.module}/chart"
+  timeout   = var.chart_timeout
+  values    = [yamlencode(local.chart_values)]
+  atomic    = true
 
-  manifest = {
-    apiVersion = "cert-manager.io/v1"
-    kind       = "Issuer"
-    metadata = {
-      name      = each.value.name
-      namespace = each.value.namespace
-    }
-    spec = {
-      ca = {
-        secretName = each.value.secret_name # checkov:skip=CKV_SECRET_6: Irrelevent
-      }
-    }
-  }
-}
-
-resource "kubernetes_manifest" "certificate" {
-  manifest = {
-    apiVersion = "cert-manager.io/v1"
-    kind       = "Certificate"
-    metadata = {
-      name      = "linkerd-identity-issuer"
-      namespace = var.namespace
-    }
-    spec = {
-      commonName = "identity.linkerd.cluster.local"
-      dnsNames   = ["identity.linkerd.cluster.local"]
-      duration   = var.certificate_controlplane_duration
-      isCA       = true
-      issuerRef = {
-        kind = "Issuer"
-        name = "linkerd-trust-anchor"
-      }
-      privateKey = {
-        algorithm = "ECDSA"
-      }
-      renewBefore = var.certificate_controlplane_renewbefore
-      secretName  = "linkerd-identity-issuer" # checkov:skip=CKV_SECRET_6: Irrelevent
-      usages      = ["cert sign", "crl sign", "server auth", "client auth"]
-    }
-  }
-}
-
-resource "kubernetes_manifest" "webhook" {
-  for_each = local.certificates
-
-  manifest = {
-    apiVersion = "cert-manager.io/v1"
-    kind       = "Certificate"
-    metadata = {
-      name      = each.value.name
-      namespace = each.value.namespace
-    }
-    spec = {
-      commonName  = "${each.value.name}.linkerd.svc"
-      dnsNames    = ["${each.value.name}.linkerd.svc"]
-      duration    = var.certificate_webhook_duration
-      renewBefore = var.certificate_webhook_renewbefore
-      #isCA        = false
-      privateKey = { algorithm = "ECDSA" }
-      secretName = "${each.value.name}-k8s-tls" # checkov:skip=CKV_SECRET_6: Irrelevent
-      usages     = ["server auth"]
-      issuerRef = {
-        kind = "Issuer"
-        name = "webhook-issuer"
-      }
-    }
-  }
+  depends_on = [kubernetes_secret.this]
 }

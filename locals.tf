@@ -23,7 +23,7 @@ locals {
 
   components = {
     linkerd = ["proxyInjector", "profileValidator"]
-    viz    = ["tap", "tapInjector"]
-    jaeger = ["webhook"]
+    viz     = ["tap", "tapInjector"]
+    jaeger  = ["webhook"]
   }
 }

@@ -14,6 +14,21 @@ locals {
     }
   }
 
+  chart_values = {
+    installLinkerdViz    = contains(var.extensions, "viz")
+    installLinkerdJaeger = contains(var.extensions, "jaeger")
+    certificate = {
+      controlplane = {
+        duration    = var.certificate_controlplane_duration
+        renewbefore = var.certificate_controlplane_renewbefore
+      }
+      webhook = {
+        duration    = var.certificate_webhook_duration
+        renewbefore = var.certificate_webhook_renewbefore
+      }
+    }
+  }
+
   issuers = merge(
     {
       linkerd-trust-anchor = {

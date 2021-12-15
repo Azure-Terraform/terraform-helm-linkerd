@@ -4,6 +4,12 @@ variable "namespace" {
   default     = "linkerd"
 }
 
+variable "chart_timeout" {
+  description = "The number of seconds to wait for the linkerd chart to be deployed. the default is 900 (15 minutes)"
+  type        = string
+  default     = "900"
+}
+
 variable "extensions" {
   description = "Linkerd extensions to install."
   type        = set(string)
