@@ -25,4 +25,8 @@ locals {
     viz     = ["tap", "tapInjector"]
     jaeger  = ["webhook"]
   }
+
+  extension_values = {
+    viz = var.ha_enabled ? [file("${path.module}/templates/viz-ha.yaml")] : []
+  }
 }

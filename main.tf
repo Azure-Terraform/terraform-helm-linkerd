@@ -1,5 +1,16 @@
 resource "time_static" "cert_create_time" {}
 
+resource "helm_release" "crds"  {
+  name       = "linkerd"
+  chart      = "linkerd-crds"
+  namespace  = var.chart_namespace
+  repository = var.chart_repository
+  version    = var.chart_version
+  timeout    = var.chart_timeout
+  atomic     = var.atomic
+  create_namespace = true
+}
+
 module "issuer" {
   source = "./modules/issuer"
 
@@ -9,13 +20,8 @@ module "issuer" {
   trust_anchor_validity_hours = var.trust_anchor_validity_hours
   issuer_validity_hours       = var.issuer_validity_hours
   ca_cert_expiration_hours    = var.ca_cert_expiration_hours
-}
 
-resource "kubernetes_namespace" "cni" {
-  count = var.cni_enabled ? 1 : 0
-  metadata {
-    name = "linkerd-cni"
-  }
+  depends_on = [helm_release.crds]
 }
 
 resource "helm_release" "cni" {
@@ -25,24 +31,9 @@ resource "helm_release" "cni" {
   namespace  = "linkerd-cni"
   chart      = "linkerd2-cni"
   repository = var.chart_repository
-  atomic     = var.atomic
-
-  set {
-    name  = "installNamespace"
-    value = "false"
-  }
-
-  depends_on = [kubernetes_namespace.cni]
-}
-
-resource "helm_release" "crds"  {
-  name       = "linkerd"
-  chart      = "linkerd-crds"
-  namespace  = var.chart_namespace
-  repository = var.chart_repository
-  version    = var.chart_version
   timeout    = var.chart_timeout
   atomic     = var.atomic
+  create_namespace = true
 }
 
 resource "helm_release" "control_plane" {
@@ -76,7 +67,7 @@ resource "helm_release" "control_plane" {
   }
 
   values = concat(
-    #var.ha_enabled ? [data.http.ha_values[0].body] : [],
+    var.ha_enabled ? [file("${path.module}/templates/control-plane-ha.yaml")] : [],
     [yamlencode(local.linkerd), var.additional_yaml_config]
   )
 
@@ -86,19 +77,14 @@ resource "helm_release" "control_plane" {
 resource "helm_release" "extension" {
   for_each = var.extensions
 
+  name      = "linkerd-${each.key}"
+  chart     = "linkerd-${each.key}"
+  namespace = "linkerd-${each.key}"
+
   repository = var.chart_repository
   version    = var.chart_version
   timeout    = var.chart_timeout
   atomic     = var.atomic
-
-  name      = format("linkerd-%s", each.key)
-  chart     = format("linkerd-%s", each.key)
-  namespace = format("linkerd-%s", each.key)
-
-  set {
-    name  = "installNamespace"
-    value = false
-  }
 
   dynamic "set_sensitive" {
     for_each = toset(local.components[each.key])
@@ -116,8 +102,8 @@ resource "helm_release" "extension" {
     }
   }
 
-  #values = var.ha_enabled && each.key == "viz" ? [data.http.viz_ha_values[0].body] : []
+  values = lookup(local.extension_values, each.key, [])
 
-  depends_on = [helm_release.linkerd]
+  depends_on = [helm_release.control_plane]
 }
 
