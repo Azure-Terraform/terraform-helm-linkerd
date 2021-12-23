@@ -10,7 +10,7 @@ variable "chart_repository" {
 variable "chart_version" {
   description = "Helm chart version"
   type        = string
-  default     = "21.12.3"
+  default     = "1.0.0-edge"
 }
 
 variable "chart_namespace" {
