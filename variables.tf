@@ -4,13 +4,13 @@
 variable "chart_repository" {
   description = "Helm chart repository"
   type        = string
-  default     = "https://helm.linkerd.io/stable"
+  default     = "https://helm.linkerd.io/edge"
 }
 
 variable "chart_version" {
   description = "Helm chart version"
   type        = string
-  default     = "2.11.1"
+  default     = "21.12.3"
 }
 
 variable "chart_namespace" {

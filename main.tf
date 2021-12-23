@@ -35,9 +35,19 @@ resource "helm_release" "cni" {
   depends_on = [kubernetes_namespace.cni]
 }
 
-resource "helm_release" "linkerd" {
+resource "helm_release" "crds"  {
   name       = "linkerd"
-  chart      = "linkerd2"
+  chart      = "linkerd-crds"
+  namespace  = var.chart_namespace
+  repository = var.chart_repository
+  version    = var.chart_version
+  timeout    = var.chart_timeout
+  atomic     = var.atomic
+}
+
+resource "helm_release" "control_plane" {
+  name       = "linkerd"
+  chart      = "linkerd-control-plane"
   namespace  = var.chart_namespace
   repository = var.chart_repository
   version    = var.chart_version
@@ -66,7 +76,7 @@ resource "helm_release" "linkerd" {
   }
 
   values = concat(
-    var.ha_enabled ? [data.http.ha_values[0].body] : [],
+    #var.ha_enabled ? [data.http.ha_values[0].body] : [],
     [yamlencode(local.linkerd), var.additional_yaml_config]
   )
 
@@ -106,7 +116,7 @@ resource "helm_release" "extension" {
     }
   }
 
-  values = var.ha_enabled && each.key == "viz" ? [data.http.viz_ha_values[0].body] : []
+  #values = var.ha_enabled && each.key == "viz" ? [data.http.viz_ha_values[0].body] : []
 
   depends_on = [helm_release.linkerd]
 }
