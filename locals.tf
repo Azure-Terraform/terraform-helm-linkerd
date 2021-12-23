@@ -16,7 +16,7 @@ locals {
         matchExpressions = [
           { key = "linkerd.io/is-control-plane", operator = "DoesNotExist" },
           { key = "linkerd", operator = "In", values = ["enabled"] }
-          ]
+        ]
       }
     }
     # Must ignore outbound 443 for vault injector to work
@@ -32,10 +32,10 @@ locals {
   extension_values = {
     viz = concat(var.ha_enabled ? [file("${path.module}/templates/viz-ha.yaml")] : [], [
       yamlencode({
-      prometheusUrl = "prometheus-aks-app-doliv-dev.us-doliv-dev.azure.lnrsg.io"
-      prometheus = { enabled = false }
-      grafanaUrl = "grafana-aks-app-doliv-dev.us-doliv-dev.azure.lnrsg.io"
-      grafana = { enabled = false }
+        prometheusUrl = var.prometheus_url
+        prometheus    = { enabled = (var.prometheus_url == null) }
+        grafanaUrl    = var.grafana_url
+        grafana       = { enabled = (var.grafana_url == null) }
     })])
   }
 }

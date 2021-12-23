@@ -1,15 +1,15 @@
 resource "time_static" "cert_create_time" {}
 
-resource "helm_release" "crds"  {
-  name       = "linkerd"
-  chart      = "linkerd-crds"
-  namespace  = var.chart_namespace
-  repository = var.chart_repository
-  version    = var.chart_version
-  timeout    = var.chart_timeout
-  atomic     = var.atomic
+resource "helm_release" "crds" {
+  name             = "linkerd"
+  chart            = "linkerd-crds"
+  namespace        = var.chart_namespace
+  repository       = var.chart_repository
+  version          = var.chart_version
+  timeout          = var.chart_timeout
+  atomic           = var.atomic
   create_namespace = true
-  devel = true
+  devel            = true
 }
 
 module "issuer" {
@@ -28,14 +28,14 @@ module "issuer" {
 resource "helm_release" "cni" {
   count = var.cni_enabled ? 1 : 0
 
-  name       = "linkerd-cni"
-  namespace  = "linkerd-cni"
-  chart      = "linkerd2-cni"
-  repository = var.chart_repository
-  timeout    = var.chart_timeout
-  atomic     = var.atomic
+  name             = "linkerd-cni"
+  namespace        = "linkerd-cni"
+  chart            = "linkerd2-cni"
+  repository       = var.chart_repository
+  timeout          = var.chart_timeout
+  atomic           = var.atomic
   create_namespace = true
-  devel = true
+  devel            = true
 }
 
 resource "helm_release" "control_plane" {
@@ -46,7 +46,7 @@ resource "helm_release" "control_plane" {
   version    = var.chart_version
   timeout    = var.chart_timeout
   atomic     = var.atomic
-  devel = true
+  devel      = true
 
   set_sensitive {
     name  = "identityTrustAnchorsPEM"
@@ -87,7 +87,7 @@ resource "helm_release" "extension" {
   repository = var.chart_repository
   timeout    = var.chart_timeout
   atomic     = var.atomic
-  devel = true
+  devel      = true
 
   dynamic "set_sensitive" {
     for_each = toset(local.components[each.key])

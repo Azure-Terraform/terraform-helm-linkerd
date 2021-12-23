@@ -43,6 +43,18 @@ variable "ha_enabled" {
   default     = true
 }
 
+variable "prometheus_url" {
+  type        = string
+  description = "Endpoint for existing prometheus deployment."
+  default     = null
+}
+
+variable "grafana_url" {
+  type        = string
+  description = "Endpoint for existing grafana deployment."
+  default     = null
+}
+
 variable "trust_anchor_validity_hours" {
   description = "Number of hours for which the trust anchor certification is valid"
   type        = number
