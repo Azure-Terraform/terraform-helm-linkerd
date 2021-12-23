@@ -39,7 +39,7 @@ resource "helm_release" "cni" {
 }
 
 resource "helm_release" "control_plane" {
-  name       = "linkerd"
+  name       = "linkerd-control-plane"
   chart      = "linkerd-control-plane"
   namespace  = var.chart_namespace
   repository = var.chart_repository
