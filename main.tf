@@ -4,8 +4,8 @@ resource "helm_release" "crds" {
   name             = "linkerd"
   chart            = "linkerd-crds"
   namespace        = var.chart_namespace
-  repository       = var.chart_repository
-  version          = var.chart_version
+  repository       = "https://helm.linkerd.io/edge"
+  version          = "1.1.9-edge"
   timeout          = var.chart_timeout
   atomic           = var.atomic
   create_namespace = true
@@ -42,8 +42,8 @@ resource "helm_release" "control_plane" {
   name       = "linkerd-control-plane"
   chart      = "linkerd-control-plane"
   namespace  = var.chart_namespace
-  repository = var.chart_repository
-  version    = var.chart_version
+  repository = "https://helm.linkerd.io/edge"
+  version    = "1.1.9-edge"
   timeout    = var.chart_timeout
   atomic     = var.atomic
   devel      = true
