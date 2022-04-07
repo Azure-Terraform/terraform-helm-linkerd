@@ -22,17 +22,6 @@ resource "tls_self_signed_cert" "this" {
   }
 }
 
-
-# create namespaces for linkerd and any extensions (linkerd-viz or linkerd-jaeger)
-resource "kubernetes_namespace" "namespace" {
-  for_each = toset([for n in local.namespaces : n if n != var.namespace])
-  metadata {
-    name        = each.key
-    annotations = { "linkerd.io/inject" = "enabled" }
-    labels      = { "linkerd.io/extension" = trimprefix(each.key, "linkerd-") }
-  }
-}
-
 # create secret used for the control plane credentials
 resource "kubernetes_secret" "this" {
   for_each = local.issuers
@@ -48,8 +37,6 @@ resource "kubernetes_secret" "this" {
     "tls.crt" : tls_self_signed_cert.this[each.value.cert_key].cert_pem
     "tls.key" : tls_private_key.this[each.value.cert_key].private_key_pem
   }
-
-  depends_on = [kubernetes_namespace.namespace]
 }
 
 resource "helm_release" "issuer" {
