@@ -1,5 +1,20 @@
 resource "time_static" "cert_create_time" {}
 
+# create namespaces for linkerd and any extensions (linkerd-viz or linkerd-jaeger)
+resource "kubernetes_namespace" "namespace" {
+  for_each = toset(local.namespaces)
+  metadata {
+    name        = each.key
+    annotations = { "linkerd.io/inject" = "disabled" }
+    labels      = {
+      "linkerd.io/extension" = trimprefix(each.key, "linkerd-")
+      "linkerd.io/is-control-plane" = "true"
+      "linkerd.io/control-plane-ns" = each.key
+      "config.linkerd.io/admission-webhooks" = "disabled"
+    }
+  }
+}
+
 resource "helm_release" "crds" {
   name             = "linkerd"
   chart            = "linkerd-crds"
@@ -8,8 +23,10 @@ resource "helm_release" "crds" {
   version          = "1.0.2-edge"
   timeout          = var.chart_timeout
   atomic           = var.atomic
-  create_namespace = true
+  create_namespace = false
   devel            = true
+
+  depends_on = [kubernetes_namespace.namespace]
 }
 
 module "issuer" {
@@ -26,6 +43,8 @@ module "issuer" {
 }
 
 resource "helm_release" "cni" {
+  depends_on = ["kubernetes_namespace.namespace"]
+  
   count = var.cni_enabled ? 1 : 0
 
   name             = "linkerd-cni"
@@ -42,6 +61,7 @@ resource "helm_release" "control_plane" {
   name       = "linkerd-control-plane"
   chart      = "linkerd-control-plane"
   namespace  = var.chart_namespace
+  create_namespace = false
   repository = "https://helm.linkerd.io/edge"
   version    = "1.1.9-edge"
   timeout    = var.chart_timeout
