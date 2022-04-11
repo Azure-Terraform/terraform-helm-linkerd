@@ -1,15 +1,15 @@
 # Configure terraform and providers
 terraform {
-  required_version = ">= 0.14.0"
+  required_version = ">= 0.15.0"
 
   required_providers {
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.1.0"
+      version = ">= 2.1.1"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 1.13.3"
+      version = ">= 2.5.0"
     }
     local = {
       source  = "hashicorp/local"
