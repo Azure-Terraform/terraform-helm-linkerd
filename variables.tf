@@ -4,13 +4,13 @@
 variable "chart_repository" {
   description = "Helm chart repository"
   type        = string
-  default     = "https://helm.linkerd.io/stable"
+  default     = "https://helm.linkerd.io/edge"
 }
 
 variable "chart_version" {
   description = "Helm chart version"
   type        = string
-  default     = "2.11.1"
+  default     = "1.0.0-edge"
 }
 
 variable "chart_namespace" {
@@ -41,6 +41,18 @@ variable "ha_enabled" {
   type        = bool
   description = "Whether to enable high availability settings."
   default     = true
+}
+
+variable "prometheus_url" {
+  type        = string
+  description = "Endpoint for existing prometheus deployment."
+  default     = null
+}
+
+variable "grafana_url" {
+  type        = string
+  description = "Endpoint for existing grafana deployment."
+  default     = null
 }
 
 variable "trust_anchor_validity_hours" {

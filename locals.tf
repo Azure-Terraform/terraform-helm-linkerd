@@ -9,7 +9,6 @@ locals {
 
   linkerd = {
     cniEnabled       = var.cni_enabled
-    installNamespace = false
     disableHeartBeat = true
     identity = {
       issuer = {
@@ -25,5 +24,15 @@ locals {
     linkerd = ["proxyInjector", "profileValidator"]
     viz     = ["tap", "tapInjector"]
     jaeger  = ["webhook"]
+  }
+
+  extension_values = {
+    viz = concat(var.ha_enabled ? [file("${path.module}/templates/viz-ha.yaml")] : [], [
+      yamlencode({
+        prometheusUrl = var.prometheus_url
+        prometheus    = { enabled = (var.prometheus_url == null) }
+        grafanaUrl    = var.grafana_url
+        grafana       = { enabled = (var.grafana_url == null) }
+    })])
   }
 }

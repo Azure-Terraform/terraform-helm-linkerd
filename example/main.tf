@@ -23,4 +23,7 @@ module "service_mesh" {
   additional_yaml_config = yamlencode({ "identity" : { "issuer" : { "clockSkewAllowance" : "30s" } } })
 
   extensions = ["viz"]
+
+  prometheus_url = "prometheus-aks-app-doliv-dev.us-doliv-dev.azure.lnrsg.io"
+  grafana_url    = "grafana-aks-app-doliv-dev.us-doliv-dev.azure.lnrsg.io"
 }
