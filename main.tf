@@ -20,7 +20,7 @@ resource "helm_release" "crds" {
   chart            = "linkerd-crds"
   namespace        = var.chart_namespace
   repository       = "https://helm.linkerd.io/edge"
-  version          = "1.0.2-edge"
+  version          = "1.3.0-edge"
   timeout          = var.chart_timeout
   atomic           = var.atomic
   create_namespace = false
