@@ -20,7 +20,7 @@ resource "helm_release" "crds" {
   chart            = "linkerd-crds"
   namespace        = var.chart_namespace
   repository       = "https://helm.linkerd.io/edge"
-  version          = "1.3.0-edge"
+  version          = "1.4.0"
   timeout          = var.chart_timeout
   atomic           = var.atomic
   create_namespace = false
@@ -44,7 +44,7 @@ module "issuer" {
 
 resource "helm_release" "cni" {
   depends_on = [kubernetes_namespace.namespace]
-  
+
   count = var.cni_enabled ? 1 : 0
 
   name             = "linkerd-cni"
@@ -63,7 +63,7 @@ resource "helm_release" "control_plane" {
   namespace  = var.chart_namespace
   create_namespace = false
   repository = "https://helm.linkerd.io/edge"
-  version    = "1.1.9-edge"
+  version    = "1.9.3-edge"
   timeout    = var.chart_timeout
   atomic     = var.atomic
   devel      = true
