@@ -16,6 +16,23 @@ locals {
         crtExpiry = local.cert_expiration_date
       }
     }
+    priorityClassName = "system-cluster-critical"
+
+    nodeSelector = {
+      "kubernetes.io/os" = "linux"
+      "lnrs.io/tier"     = "system"
+    }
+
+    tolerations = [
+      {
+        key      = "CriticalAddonsOnly"
+        operator = "Exists"
+      },
+      {
+        key      = "system"
+        operator = "Exists"
+      }
+    ]
     # Must ignore outbound 443 for vault injector to work
     # proxyInit = { ignoreOutboundPorts = "4567,4568,443" }
   }

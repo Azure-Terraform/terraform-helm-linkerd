@@ -6,10 +6,10 @@ resource "kubernetes_namespace" "namespace" {
   metadata {
     name        = each.key
     annotations = { "linkerd.io/inject" = "disabled" }
-    labels      = {
-      "linkerd.io/extension" = trimprefix(each.key, "linkerd-")
-      "linkerd.io/is-control-plane" = "true"
-      "linkerd.io/control-plane-ns" = each.key
+    labels = {
+      "linkerd.io/extension"                 = trimprefix(each.key, "linkerd-")
+      "linkerd.io/is-control-plane"          = "true"
+      "linkerd.io/control-plane-ns"          = each.key
       "config.linkerd.io/admission-webhooks" = "disabled"
     }
   }
@@ -44,7 +44,7 @@ module "issuer" {
 
 resource "helm_release" "cni" {
   depends_on = [kubernetes_namespace.namespace]
-  
+
   count = var.cni_enabled ? 1 : 0
 
   name             = "linkerd-cni"
@@ -58,15 +58,15 @@ resource "helm_release" "cni" {
 }
 
 resource "helm_release" "control_plane" {
-  name       = "linkerd-control-plane"
-  chart      = "linkerd-control-plane"
-  namespace  = var.chart_namespace
+  name             = "linkerd-control-plane"
+  chart            = "linkerd-control-plane"
+  namespace        = var.chart_namespace
   create_namespace = false
-  repository = "https://helm.linkerd.io/edge"
-  version    = "1.1.9-edge"
-  timeout    = var.chart_timeout
-  atomic     = var.atomic
-  devel      = true
+  repository       = "https://helm.linkerd.io/edge"
+  version          = "1.1.9-edge"
+  timeout          = var.chart_timeout
+  atomic           = var.atomic
+  devel            = true
 
   set_sensitive {
     name  = "identityTrustAnchorsPEM"
