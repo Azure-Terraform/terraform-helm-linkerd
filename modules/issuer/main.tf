@@ -9,7 +9,6 @@ resource "tls_private_key" "this" {
 resource "tls_self_signed_cert" "this" {
   for_each = local.certs
 
-  key_algorithm     = tls_private_key.this[each.key].algorithm
   private_key_pem   = tls_private_key.this[each.key].private_key_pem
   is_ca_certificate = true
 

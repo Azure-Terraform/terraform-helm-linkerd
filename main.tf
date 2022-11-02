@@ -6,10 +6,10 @@ resource "kubernetes_namespace" "namespace" {
   metadata {
     name        = each.key
     annotations = { "linkerd.io/inject" = "disabled" }
-    labels      = {
-      "linkerd.io/extension" = trimprefix(each.key, "linkerd-")
-      "linkerd.io/is-control-plane" = "true"
-      "linkerd.io/control-plane-ns" = each.key
+    labels = {
+      "linkerd.io/extension"                 = trimprefix(each.key, "linkerd-")
+      "linkerd.io/is-control-plane"          = "true"
+      "linkerd.io/control-plane-ns"          = each.key
       "config.linkerd.io/admission-webhooks" = "disabled"
     }
   }
@@ -58,9 +58,9 @@ resource "helm_release" "cni" {
 }
 
 resource "helm_release" "control_plane" {
-  name       = "linkerd-control-plane"
-  chart      = "linkerd-control-plane"
-  namespace  = var.chart_namespace
+  name             = "linkerd-control-plane"
+  chart            = "linkerd-control-plane"
+  namespace        = var.chart_namespace
   create_namespace = false
   repository = "https://helm.linkerd.io/edge"
   version    = "1.9.3-edge"
@@ -129,4 +129,3 @@ resource "helm_release" "extension" {
 
   depends_on = [helm_release.control_plane]
 }
-
