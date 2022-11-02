@@ -20,7 +20,7 @@ resource "helm_release" "crds" {
   chart            = "linkerd-crds"
   namespace        = var.chart_namespace
   repository       = "https://helm.linkerd.io/edge"
-  version          = "1.3.0-edge"
+  version          = "1.4.0"
   timeout          = var.chart_timeout
   atomic           = var.atomic
   create_namespace = false
@@ -62,11 +62,11 @@ resource "helm_release" "control_plane" {
   chart            = "linkerd-control-plane"
   namespace        = var.chart_namespace
   create_namespace = false
-  repository       = "https://helm.linkerd.io/edge"
-  version          = "1.1.9-edge"
-  timeout          = var.chart_timeout
-  atomic           = var.atomic
-  devel            = true
+  repository = "https://helm.linkerd.io/edge"
+  version    = "1.9.3-edge"
+  timeout    = var.chart_timeout
+  atomic     = var.atomic
+  devel      = true
 
   set_sensitive {
     name  = "identityTrustAnchorsPEM"
@@ -129,4 +129,3 @@ resource "helm_release" "extension" {
 
   depends_on = [helm_release.control_plane]
 }
-
